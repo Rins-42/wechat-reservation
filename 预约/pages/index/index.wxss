@@ -1,0 +1,151 @@
+page {
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.scrollarea {
+    flex: 1;
+    overflow-y: hidden;
+}
+
+.userinfo {
+    align-items: center;
+    color: #aaa;
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+}
+
+.userinfo-avatar {
+    border-radius: 50%;
+    height: 128rpx;
+    margin: 20rpx;
+    overflow: hidden;
+    width: 128rpx;
+}
+
+.usermotto {
+    margin-top: 200px;
+}
+
+.avatar-wrapper {
+    border-radius: 8px;
+    margin-bottom: 40px;
+    margin-top: 40px;
+    padding: 0;
+    width: 56px!important;
+}
+
+.avatar {
+    display: block;
+    height: 56px;
+    width: 56px;
+}
+
+.nickname-wrapper {
+    border-bottom: .5px solid rgba(0,0,0,.1);
+    border-top: .5px solid rgba(0,0,0,.1);
+    box-sizing: border-box;
+    color: #000;
+    display: -webkit-flex;
+    display: flex;
+    padding: 16px;
+    width: 100%;
+}
+
+.nickname-label {
+    width: 105px;
+}
+
+.nickname-input {
+    flex: 1;
+}
+
+.container {
+    background: #f8f8f8;
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 40rpx;
+}
+
+.title {
+    color: #333;
+    font-size: 40rpx;
+    font-weight: 700;
+    margin-bottom: 60rpx;
+    text-align: center;
+}
+
+.module-container {
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: column;
+    gap: 30rpx;
+    margin-bottom: auto;
+}
+
+.module {
+    background: #fff;
+    border-radius: 12rpx;
+    box-shadow: 0 2rpx 10rpx rgba(0,0,0,.05);
+    padding: 40rpx;
+}
+
+.module-title {
+    color: #333;
+    font-size: 32rpx;
+    font-weight: 700;
+    margin-bottom: 16rpx;
+}
+
+.module-desc {
+    color: #666;
+    font-size: 28rpx;
+}
+
+.button-group {
+    flex-direction: column;
+    gap: 30rpx;
+}
+
+.btn,.button-group {
+    display: -webkit-flex;
+    display: flex;
+    width: 100%;
+}
+
+.btn {
+    align-items: center;
+    background-color: #007aff;
+    border-radius: 10rpx;
+    height: 100rpx;
+    justify-content: center;
+}
+
+.btn text {
+    color: #fff;
+    font-size: 32rpx;
+}
+
+.admin-container {
+    margin-top: 60rpx;
+    padding-bottom: 40rpx;
+}
+
+.admin-entry {
+    background: #333;
+    border-radius: 8rpx;
+    color: #fff;
+    font-size: 28rpx;
+    margin: 0 auto;
+    padding: 20rpx 40rpx;
+    text-align: center;
+    width: 200rpx;
+}
+
+

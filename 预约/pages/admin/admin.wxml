@@ -1,0 +1,312 @@
+<!-- 管理员页面 -->
+<view class="page-container">
+    <!-- 标签页导航 -->
+    <view class="tabs">
+        <view class="tab {{currentTab === 'categories' ? 'active' : ''}}" 
+              bindtap="switchTab" 
+              data-tab="categories">分类管理</view>
+        <view class="tab {{currentTab === 'items' ? 'active' : ''}}" 
+              bindtap="switchTab" 
+              data-tab="items">项目管理</view>
+        <view class="tab {{currentTab === 'reservations' ? 'active' : ''}}" 
+              bindtap="switchTab" 
+              data-tab="reservations">预约管理</view>
+    </view>
+
+    <!-- 分类管理标签页 -->
+    <view wx:if="{{currentTab === 'categories'}}" class="tab-content">
+        <view class="section-header">
+            <view class="header-main">
+                <text class="section-title">分类管理</text>
+                <button class="action-btn" bindtap="refreshCurrentTab" disabled="{{loading}}">
+                    <text class="refresh-icon {{loading ? 'loading' : ''}}">🔄</text>
+                    <text class="btn-text">{{loading ? '刷新中' : '刷新'}}</text>
+                </button>
+            </view>
+        </view>
+
+        <view class="add-section">
+            <view class="form-item">
+                <text class="label">分类名称</text>
+                <input class="input" placeholder="请输入分类名称" 
+                       value="{{newCategory}}" bindinput="onCategoryNameInput" />
+            </view>
+            <button class="add-btn" bindtap="addCategory" disabled="{{loading}}">添加分类</button>
+        </view>
+
+        <view class="list">
+            <scroll-view class="content-scroll" scroll-y="true" bindscrolltolower="onReachBottom">
+                <!-- 分类列表 -->
+                <view wx:for="{{categories}}" wx:key="_id" 
+                      class="list-item category-item {{item.expanded ? 'expanded' : ''}}">
+                    <view class="item-info" bindtap="toggleCategoryExpand" data-id="{{item._id}}">
+                        <view class="item-header">
+                            <view class="item-title">
+                                <view class="item-name">{{item.name}}</view>
+                                <view class="item-desc">包含 {{item.itemCount || 0}} 个项目</view>
+                            </view>
+                            <view class="expand-icon">{{item.expanded ? '▼' : '▶'}}</view>
+                        </view>
+                    </view>
+                    
+                    <view class="item-actions">
+                        <view class="action-btn edit" bindtap="editCategory" 
+                              data-id="{{item._id}}" data-name="{{item.name}}">编</view>
+                        <view class="action-btn delete" bindtap="deleteCategory" 
+                              data-id="{{item._id}}">删</view>
+                    </view>
+
+                    <!-- 展开的项目列表 -->
+                    <view wx:if="{{item.expanded}}" class="category-items expanded">
+                        <view wx:if="{{item.items && item.items.length > 0}}">
+                            <view wx:for="{{item.items}}" wx:key="_id" class="sub-item">
+                                <text class="sub-item-name">{{item.name}}</text>
+                            </view>
+                        </view>
+                        <view wx:else class="empty-tip">暂无项目</view>
+                    </view>
+                </view>
+
+                <!-- 空状态 -->
+                <view wx:if="{{categories.length === 0 && !loading}}" class="empty-tip">
+                    暂无分类，请添加
+                </view>
+
+                <!-- 加载状态 -->
+                <view wx:if="{{loading}}" class="loading-tip">
+                    <view class="loading-spinner"></view>
+                    <text>加载中...</text>
+                </view>
+
+                <!-- 没有更多 -->
+                <view wx:if="{{!loading && !hasMore}}" class="loading-tip">
+                    <text class="divider">——</text>
+                    <text>没有更多了</text>
+                    <text class="divider">——</text>
+                </view>
+            </scroll-view>
+        </view>
+    </view>
+
+    <!-- 项目管理标签页 -->
+    <view wx:if="{{currentTab === 'items'}}" class="tab-content">
+        <view class="section-header">
+            <view class="header-main">
+                <text class="section-title">项目管理</text>
+                <button class="action-btn" bindtap="refreshCurrentTab" disabled="{{loading}}">
+                    <text class="refresh-icon {{loading ? 'loading' : ''}}">🔄</text>
+                    <text class="btn-text">{{loading ? '刷新中' : '刷新'}}</text>
+                </button>
+            </view>
+            <view class="header-sub">
+                <button class="action-btn" bindtap="showDefaultSettings">
+                    <text class="action-icon">⚙️</text>
+                    <text class="btn-text">默认设置</text>
+                </button>
+                <button class="action-btn primary" bindtap="addItem">
+                    <text class="action-icon">+</text>
+                    <text class="btn-text">添加项目</text>
+                </button>
+            </view>
+        </view>
+
+        <view class="search-box">
+            <input class="search-input" placeholder="搜索项目名称、描述或分类" 
+                   value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="onSearch" />
+            <view class="search-btn" bindtap="onSearch">
+                <text class="search-icon">🔍</text>
+            </view>
+        </view>
+
+        <view class="list">
+            <scroll-view class="content-scroll" scroll-y="true" bindscrolltolower="onReachBottom">
+                <!-- 项目列表 -->
+                <view wx:for="{{items}}" wx:key="_id" class="list-item {{item.selected ? 'selected' : ''}}">
+                    <view class="item-select">
+                        <checkbox checked="{{item.selected}}" 
+                                  bindtap="toggleItemSelect" data-id="{{item._id}}" />
+                    </view>
+                    
+                    <view class="item-content">
+                        <view class="item-header">
+                            <view class="item-title">
+                                <view wx:if="{{item.categoryName}}" class="item-category">
+                                    {{item.categoryName}}
+                                </view>
+                                <text class="item-name">{{item.name || '未命名项目'}}</text>
+                            </view>
+                            <view class="item-actions">
+                                <view class="action-btn edit" bindtap="editItem" data-id="{{item._id}}">编</view>
+                                <view class="action-btn delete" bindtap="deleteItem" data-id="{{item._id}}">删</view>
+                            </view>
+                        </view>
+                        
+                        <view class="item-body">
+                            <view wx:if="{{item.description}}" class="item-desc">
+                                {{item.description}}
+                            </view>
+                            <view class="item-settings">
+                                <view class="setting-tag {{item.requireApproval ? 'active' : ''}}">
+                                    <text class="tag-icon">{{item.requireApproval ? '✓' : '×'}}</text>
+                                    <text>{{item.requireApproval ? '需要审核' : '无需审核'}}</text>
+                                </view>
+                                <view class="setting-tag">
+                                    <text class="tag-icon">📅</text>
+                                    <text>可提前{{item.advanceBookingDays || 30}}天预约</text>
+                                </view>
+                                <view class="setting-tag time">
+                                    <text class="tag-icon">⏰</text>
+                                    <text>{{item.createTimeStr || '未知时间'}}</text>
+                                </view>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+
+                <!-- 空状态 -->
+                <view wx:if="{{items.length === 0 && !loading}}" class="empty-tip">
+                    <text>暂无项目，请先添加</text>
+                </view>
+
+                <!-- 加载状态 -->
+                <view wx:if="{{loading}}" class="loading-tip">
+                    <view class="loading-spinner"></view>
+                    <text>加载中...</text>
+                </view>
+
+                <!-- 没有更多 -->
+                <view wx:if="{{!loading && !hasMore}}" class="loading-tip">
+                    <text class="divider">——</text>
+                    <text>没有更多了</text>
+                    <text class="divider">——</text>
+                </view>
+            </scroll-view>
+        </view>
+
+        <!-- 批量操作 -->
+        <view wx:if="{{selectedItems.length > 0}}" class="batch-actions visible">
+            <view class="selected-count">已选择 {{selectedItems.length}} 项</view>
+            <view class="action-group">
+                <button class="batch-btn" bindtap="showBatchSettings">批量设置</button>
+                <button class="batch-btn delete" bindtap="batchDelete">批量删除</button>
+            </view>
+        </view>
+    </view>
+
+    <!-- 预约管理标签页 -->
+    <view wx:if="{{currentTab === 'reservations'}}" class="tab-content">
+        <view class="section-header">
+            <view class="header-main">
+                <text class="section-title">预约管理</text>
+                <button class="action-btn" bindtap="refreshCurrentTab" disabled="{{loading}}">
+                    <text class="refresh-icon {{loading ? 'loading' : ''}}">🔄</text>
+                    <text class="btn-text">{{loading ? '刷新中' : '刷新'}}</text>
+                </button>
+            </view>
+        </view>
+
+        <view class="list">
+            <scroll-view class="content-scroll" scroll-y="true" bindscrolltolower="onReachBottom">
+                <!-- 预约列表 -->
+                <view wx:for="{{reservations}}" wx:key="_id" class="reservation-item">
+                    <view class="reservation-header">
+                        <view class="reservation-status status-{{item.status}}">
+                            {{statusMap[item.status]}}
+                        </view>
+                    </view>
+                    
+                    <view class="reservation-content">
+                        <view class="time-info">
+                            <view class="time-row">
+                                <text class="time-label">预约时间</text>
+                                <text class="time-value">{{item.startTimeStr}} 至 {{item.endTimeStr}}</text>
+                            </view>
+                            <view wx:if="{{item.actualStartTime}}" class="time-row">
+                                <text class="time-label">实际开始</text>
+                                <text class="time-value">{{item.actualStartTimeStr}}</text>
+                            </view>
+                            <view wx:if="{{item.actualEndTime}}" class="time-row">
+                                <text class="time-label">实际结束</text>
+                                <text class="time-value">{{item.actualEndTimeStr}}</text>
+                            </view>
+                        </view>
+
+                        <view class="items-section">
+                            <text class="items-title">预约项目</text>
+                            <view class="reserved-items">
+                                <view wx:for="{{item.items}}" wx:key="_id" class="item-tag">
+                                    <text class="item-category">{{item.categoryName}}</text>
+                                    <text class="item-name">{{item.name}}</text>
+                                </view>
+                            </view>
+                        </view>
+
+                        <view wx:if="{{item.userInfo}}" class="user-info">
+                            <text class="user-label">预约人：</text>
+                            <text class="user-realname">{{item.userInfo.realName || item.userInfo.nickName}}</text>
+                        </view>
+
+                        <view wx:if="{{item.purpose}}" class="purpose-info">
+                            <text class="purpose-label">使用用途：</text>
+                            <text class="purpose-text">{{item.purpose}}</text>
+                        </view>
+                    </view>
+
+                    <!-- 待审核预约的操作按钮 -->
+                    <view wx:if="{{item.status === 'pending'}}" class="reservation-actions">
+                        <button class="action-btn btn-approve" bindtap="approveReservation" 
+                                disabled="{{loading}}" data-id="{{item._id}}">通过</button>
+                        <button class="action-btn btn-reject" bindtap="rejectReservation" 
+                                disabled="{{loading}}" data-id="{{item._id}}">拒绝</button>
+                    </view>
+                </view>
+
+                <!-- 空状态 -->
+                <view wx:if="{{reservations.length === 0 && !loading}}" class="empty-tip">
+                    暂无预约记录
+                </view>
+
+                <!-- 加载状态 -->
+                <view wx:if="{{loading}}" class="loading-tip">
+                    <text>加载中...</text>
+                </view>
+
+                <!-- 没有更多 -->
+                <view wx:if="{{!loading && !hasMore}}" class="loading-tip">
+                    <text>没有更多了</text>
+                </view>
+            </scroll-view>
+        </view>
+    </view>
+
+    <!-- 批量设置弹窗 -->
+    <view wx:if="{{showBatchModal}}" class="modal">
+        <view class="modal-content">
+            <view class="modal-header">
+                <text class="modal-title">{{isDefaultSettings ? '默认设置' : '批量设置'}}</text>
+                <text class="modal-close" bindtap="closeBatchModal">×</text>
+            </view>
+            
+            <view class="modal-body">
+                <view class="setting-item">
+                    <text class="setting-label">是否需要审核</text>
+                    <switch checked="{{batchSettings.requireApproval}}" 
+                            bindchange="onBatchApprovalChange" />
+                </view>
+                <view class="setting-item">
+                    <text class="setting-label">可提前预约天数</text>
+                    <input class="number-input" type="number" 
+                           value="{{batchSettings.advanceBookingDays}}" 
+                           bindinput="onBatchDaysChange" />
+                </view>
+            </view>
+            
+            <view class="modal-footer">
+                <button class="modal-btn cancel" bindtap="closeBatchModal">取消</button>
+                <button class="modal-btn confirm" bindtap="saveBatchSettings">
+                    {{isDefaultSettings ? '保存默认' : '确认修改'}}
+                </button>
+            </view>
+        </view>
+    </view>
+</view>

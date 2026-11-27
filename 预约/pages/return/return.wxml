@@ -1,0 +1,114 @@
+<!-- 归还页面 -->
+<view class="container">
+    <!-- 我的预约标题 -->
+    <view class="section">
+        <view class="section-title">
+            <text>我的预约</text>
+        </view>
+        
+        <!-- 预约列表 -->
+        <view class="reservation-list">
+            <!-- 有预约记录时显示 -->
+            <block wx:if="{{!loading && reservations.length > 0}}">
+                <block wx:for="{{reservations}}" wx:key="_id">
+                    <view class="reservation-item">
+                        <!-- 预约头部：状态标签和时间 -->
+                        <view class="reservation-header">
+                            <!-- 状态标签 -->
+                            <view class="status-tag {{'status-' + item.status}}">
+                                <text>{{item.status === 'pending' ? '待审核' : item.status === 'approved' ? '已通过' : item.status === 'rejected' ? '已拒绝' : item.status === 'using' ? '使用中' : item.status === 'returned' ? '已归还' : '已取消'}}</text>
+                            </view>
+                            
+                            <!-- 时间信息 -->
+                            <view class="time-text">
+                                <text>{{item.startTimeStr}}</text>
+                            </view>
+                        </view>
+                        
+                        <!-- 预约内容 -->
+                        <view class="reservation-content">
+                            <!-- 时间信息区域 -->
+                            <view class="time-section">
+                                <!-- 预约时间 -->
+                                <view class="time-row">
+                                    <text class="label">预约时间</text>
+                                    <text class="value">{{item.startTimeStr}} - {{item.endTimeStr}}</text>
+                                </view>
+                                
+                                <!-- 实际开始时间（如果有） -->
+                                <view class="time-row" wx:if="{{item.actualStartTimeStr}}">
+                                    <text class="label">实际开始</text>
+                                    <text class="value">{{item.actualStartTime}}</text>
+                                </view>
+                                
+                                <!-- 实际结束时间（如果有） -->
+                                <view class="time-row" wx:if="{{item.actualEndTimeStr}}">
+                                    <text class="label">实际结束</text>
+                                    <text class="value">{{item.actualEndTime}}</text>
+                                </view>
+                            </view>
+                            
+                            <!-- 预约项目区域 -->
+                            <view class="items-section">
+                                <view class="section-row">
+                                    <text class="items-title">预约项目</text>
+                                    <view class="reserved-items">
+                                        <block wx:for="{{item.items}}" wx:key="_id">
+                                            <view class="item-tag">
+                                                <text class="item-category">{{item.categoryName}}</text>
+                                                <text class="item-name">{{item.name}}</text>
+                                            </view>
+                                        </block>
+                                    </view>
+                                </view>
+                                
+                                <!-- 使用用途区域 -->
+                                <view class="section-row" wx:if="{{item.purpose}}">
+                                    <text class="items-title">使用用途</text>
+                                    <text class="purpose-content">{{item.purpose}}</text>
+                                </view>
+                            </view>
+                        </view>
+                        
+                        <!-- 操作按钮区域 -->
+                        <view class="action-bar">
+                            <!-- 开始使用按钮（状态为已通过且未开始使用时显示） -->
+                            <button class="action-btn start-btn" 
+                                    wx:if="{{item.status === 'approved' && !item.actualStartTime}}"
+                                    bindtap="startUsing" 
+                                    data-id="{{item._id}}">
+                                开始使用
+                            </button>
+                            
+                            <!-- 归还按钮（状态为使用中且未结束时显示） -->
+                            <button class="action-btn return-btn" 
+                                    wx:if="{{item.status === 'using' && !item.actualEndTime}}"
+                                    bindtap="returnItems" 
+                                    data-id="{{item._id}}">
+                                归还
+                            </button>
+                            
+                            <!-- 取消预约按钮（状态为待审核或已通过但未开始时显示） -->
+                            <button class="action-btn cancel-btn" 
+                                    wx:if="{{item.status === 'pending' || (item.status === 'approved' && !item.actualStartTime)}}"
+                                    bindtap="cancelReservation" 
+                                    data-id="{{item._id}}">
+                                取消预约
+                            </button>
+                        </view>
+                    </view>
+                </block>
+            </block>
+            
+            <!-- 加载中状态 -->
+            <view class="loading-tip" wx:elif="{{loading}}">
+                <text>加载中...</text>
+            </view>
+            
+            <!-- 空状态 -->
+            <view class="empty-tip" wx:else>
+                <text>暂无预约记录</text>
+            </view>
+        </view>
+    </view>
+</view>

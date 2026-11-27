@@ -1,0 +1,160 @@
+<view class="page-container">
+  <!-- 固定头部：已选择项目 -->
+  <view class="fixed-header">
+    <view class="section">
+      <view class="section-title">
+        已选择项目
+        <text wx:if="{{selectedItems.length > 0}}" class="selected-count">({{selectedItems.length}})</text>
+      </view>
+      
+      <scroll-view wx:if="{{selectedItems.length > 0}}" class="selected-summary" scroll-y="true">
+        <view wx:for="{{selectedItemsDetails}}" wx:key="_id" class="selected-item">
+          <view class="selected-item-info">
+            <text class="selected-item-category">{{item.categoryName}}</text>
+            <text class="selected-item-name">{{item.name}}</text>
+          </view>
+          <view class="selected-item-action">
+            <text class="remove-btn" bindtap="removeSelectedItem" data-id="{{item._id}}">×</text>
+          </view>
+        </view>
+      </scroll-view>
+      
+      <view wx:else class="empty-tip">暂未选择任何项目</view>
+    </view>
+  </view>
+
+  <!-- 主要内容区域 -->
+  <scroll-view class="main-content" scroll-y="true" enable-flex="true">
+    <!-- 分类选择 -->
+    <view class="section">
+      <view class="section-title">选择预约类别</view>
+      <scroll-view class="category-list" scroll-x="true" enhanced="true" show-scrollbar="false">
+        <view class="category-item {{currentCategory === null ? 'active' : ''}}" bindtap="switchCategory" data-id="null">
+          全部
+        </view>
+        <view wx:for="{{categories}}" wx:key="_id" 
+              class="category-item {{currentCategory === item._id ? 'active' : ''}}" 
+              bindtap="switchCategory" data-id="{{item._id}}">
+          {{item.name}}
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 项目列表 -->
+    <view class="section">
+      <view class="section-title">可预约项目</view>
+      <view class="items-list">
+        <view wx:if="{{!loading && filteredItems.length > 0}}">
+          <view wx:for="{{filteredItems}}" wx:key="_id" 
+                class="item {{item.selected ? 'selected' : ''}}" 
+                bindtap="onItemSelect" data-id="{{item._id}}">
+            <view class="item-info">
+              <view class="item-header">
+                <text class="item-category">{{item.categoryName}}</text>
+                <text wx:if="{{item.requireApproval}}" class="approval-tag">需审核</text>
+              </view>
+              <text class="item-name">{{item.name}}</text>
+              <text wx:if="{{item.description}}" class="item-desc">{{item.description}}</text>
+            </view>
+            <view wx:if="{{item.selected}}" class="select-status">
+              <text class="select-icon">✓</text>
+            </view>
+          </view>
+        </view>
+        
+        <view wx:elif="{{!loading && filteredItems.length === 0}}" class="empty-tip">
+          <text>{{currentCategory ? '该分类下暂无可预约项目' : '暂无可预约项目'}}</text>
+          <text class="sub-tip">请稍后再试或选择其他分类</text>
+        </view>
+        
+        <view wx:else class="loading-tip">
+          <text>加载中...</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 预约时间和用途 -->
+    <view class="section">
+      <view class="section-title">预约时间和用途</view>
+      <view class="time-section">
+        <!-- 开始时间 -->
+        <view class="time-row">
+          <text class="time-label">开始日期</text>
+          <picker mode="date" value="{{startDate}}" start="{{minDate}}" end="{{maxDate}}" bindchange="onStartDateChange">
+            <view class="picker">{{startDateDisplay || startDate}}</view>
+          </picker>
+        </view>
+        
+        <view class="time-row">
+          <text class="time-label">开始时间</text>
+          <picker mode="time" value="{{startTime}}" bindchange="onStartTimeChange">
+            <view class="picker">{{startTime}}</view>
+          </picker>
+        </view>
+
+        <!-- 结束时间 -->
+        <view class="time-row">
+          <text class="time-label">结束日期</text>
+          <picker mode="date" value="{{endDate}}" start="{{startDate}}" end="{{maxDate}}" bindchange="onEndDateChange">
+            <view class="picker">{{endDateDisplay || endDate}}</view>
+          </picker>
+        </view>
+        
+        <view class="time-row">
+          <text class="time-label">结束时间</text>
+          <picker mode="time" value="{{endTime}}" bindchange="onEndTimeChange">
+            <view class="picker">{{endTime}}</view>
+          </picker>
+        </view>
+
+        <!-- 使用用途 -->
+        <view class="purpose-row">
+          <text class="time-label">使用用途</text>
+          <view class="purpose-input-wrapper">
+            <textarea class="purpose-input" 
+                      placeholder="请填写使用用途（必填，不超过200字）" 
+                      maxlength="200" 
+                      value="{{purpose}}" 
+                      bindinput="onPurposeInput" />
+            <view class="word-count">{{purposeLength || 0}}/200</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 提示信息 -->
+    <view class="tips">
+      <text class="tip-text">* 支持24小时预约</text>
+      <text class="tip-text">* 最晚可预约至 {{maxDate}}，以所选项目设置为准</text>
+    </view>
+
+    <!-- 已预约时段 -->
+    <view wx:if="{{showReservationList && existingReservations.length > 0}}" class="reservation-list">
+      <view class="reservation-list-title">未来7天已预约时段</view>
+      <view class="reservation-list-content">
+        <view wx:for="{{existingReservations}}" wx:key="date" class="date-group">
+          <view class="date-header">{{item.date}}</view>
+          <view class="time-slots">
+            <view wx:for="{{item.items}}" wx:key="_id" class="time-slot">
+              <view class="time-slot-time">{{item.timeStr}}</view>
+              <view class="time-slot-items">
+                <text wx:for="{{item.items}}" wx:key="_id" class="item-tag">{{item.name}}</text>
+              </view>
+              <text class="time-slot-user">{{item.userName}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="bottom-space"></view>
+  </scroll-view>
+
+  <!-- 固定底部：提交按钮 -->
+  <view class="fixed-bottom">
+    <button class="submit-btn" bindtap="submitReservation" 
+            disabled="{{loading || selectedItems.length === 0}}">
+      提交预约
+    </button>
+  </view>
+</view>

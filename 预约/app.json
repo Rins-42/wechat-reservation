@@ -1,0 +1,16 @@
+{
+    "pages": [
+        "pages/index/index",
+        "pages/reserve/reserve",
+        "pages/return/return",
+        "pages/admin/admin",
+        "pages/admin/content/content",
+        "pages/userInfo/userInfo"
+    ],
+    "window": {
+        "backgroundTextStyle": "light",
+        "navigationBarBackgroundColor": "#fff",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "预约小程序"
+    }
+}

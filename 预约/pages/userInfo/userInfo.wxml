@@ -1,0 +1,36 @@
+<!-- 用户信息页面 -->
+<view class="container">
+    <view class="form-section">
+        <!-- 页面标题 -->
+        <view class="form-title">
+            <text>完善个人信息</text>
+        </view>
+        
+        <!-- 页面描述 -->
+        <view class="form-desc">
+            <text>请填写您的真实姓名，以便于管理员核实身份</text>
+        </view>
+        
+        <!-- 表单项目 -->
+        <view class="form-item">
+            <!-- 标签 -->
+            <view class="label">
+                <text>真实姓名</text>
+            </view>
+            
+            <!-- 输入框 -->
+            <input class="input" 
+                   type="text" 
+                   placeholder="请输入您的真实姓名" 
+                   value="{{realName}}" 
+                   bindinput="onRealNameInput" />
+        </view>
+        
+        <!-- 提交按钮 -->
+        <button class="submit-btn" 
+                bindtap="saveUserInfo" 
+                disabled="{{!realName}}">
+            <text>保存</text>
+        </button>
+    </view>
+</view>

@@ -1,0 +1,25 @@
+{
+  "name": "wechat-reservation",
+  "version": "1.0.0",
+  "description": "微信小程序预约系统",
+  "main": "app.js",
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "check": "node scripts/check.cjs"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.22.0",
+    "core-js": "^3.46.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.0",
+    "@babel/plugin-transform-runtime": "^7.22.0",
+    "@babel/preset-env": "^7.22.0"
+  },
+  "keywords": [
+    "微信小程序",
+    "预约系统",
+    "babel"
+  ],
+  "author": "开发者"
+}

@@ -1,0 +1,47 @@
+<view class="container">
+  <form bindsubmit="submitForm">
+    <view class="form-group">
+      <view class="form-row">
+        <view class="form-col">
+          <view class="form-item">
+            <text class="label">项目名称</text>
+            <input class="input" value="{{item.name}}" placeholder="请输入项目名称" bindinput="onNameInput" />
+          </view>
+        </view>
+        <view class="form-col">
+          <view class="form-item">
+            <text class="label">所属分类</text>
+            <picker class="picker" range="{{categories}}" range-key="name" value="{{categoryIndex}}" bindchange="onCategoryChange">
+              <view class="picker-inner">{{categoryIndex > -1 ? categories[categoryIndex].name : '请选择分类'}}</view>
+            </picker>
+          </view>
+        </view>
+      </view>
+      
+      <view class="form-item">
+        <text class="label">预约设置</text>
+        <view class="settings-container">
+          <view class="setting-item">
+            <text class="setting-label">是否需要审核</text>
+            <switch checked="{{item.requireApproval}}" bindchange="onApprovalChange" />
+          </view>
+          <view class="setting-item">
+            <text class="setting-label">可提前预约天数</text>
+            <input class="number-input" type="number" value="{{item.advanceBookingDays}}" bindinput="onDaysInput" />
+          </view>
+        </view>
+      </view>
+      
+      <view class="form-item description-area">
+        <text class="label">项目描述</text>
+        <textarea class="textarea" value="{{item.description}}" placeholder="请输入项目描述" bindinput="onDescriptionInput" />
+      </view>
+    </view>
+    
+    <view class="form-actions">
+      <button class="submit-btn" type="primary" formType="submit" loading="{{submitting}}">
+        {{itemId ? '保存修改' : '添加项目'}}
+      </button>
+    </view>
+  </form>
+</view>

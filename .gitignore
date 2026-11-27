@@ -1,0 +1,15 @@
+**/node_modules/
+**/miniprogram_npm/
+**/project.private.config.json
+*.wxapkg
+*.zip
+.DS_Store
+
+# 本地身份与环境配置
+**/config.local.js
+**/project.config.json
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key

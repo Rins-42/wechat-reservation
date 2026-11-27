@@ -1,0 +1,27 @@
+<scroll-view class="scrollarea" scroll-y="true" type="list">
+  <view class="container">
+    <view class="title">预约系统</view>
+    
+    <view class="module-container">
+      <navigator class="module" url="/pages/reserve/reserve">
+        <view class="module-title">预约</view>
+        <view class="module-desc">选择预约项目和时间</view>
+      </navigator>
+      
+      <navigator class="module" url="/pages/return/return">
+        <view class="module-title">归还</view>
+        <view class="module-desc">查看和归还已预约项目</view>
+      </navigator>
+    </view>
+    
+    <view class="admin-container">
+      <view wx:if="{{isAdmin}}" class="admin-entry" bindtap="navigateToAdmin">
+        管理员入口
+      </view>
+      
+      <view class="admin-status">
+        <text>管理员状态: {{isAdmin ? '是' : '否'}}</text>
+      </view>
+    </view>
+  </view>
+</scroll-view>
